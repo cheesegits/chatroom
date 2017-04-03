@@ -8,13 +8,23 @@ app.use(express.static('public'));
 var server = http.Server(app);
 var io = socket_io(server);
 
-io.on('connection', function(socket) {
-    console.log('Client connected');
-
-    socket.on('message', function(message) {
-        console.log('Received message:', message);
-        socket.broadcast.emit('message', message);
+var numberOfUsers = function() {
+    io.of('/').clients(function(error, clients) {
+        if (error) throw error;
+        console.log(clients.length);
+        io.emit('userCount', clients.length);
     });
+}
+
+io.on('connection', function(socket) {
+    numberOfUsers();
+    socket.broadcast.emit('message', 'User connected');
+    socket.broadcast.emit('message', message);
 });
+socket.on('disconnect', function() {
+    socket.broadcast.emit('message', 'User disconnected');
+    numberOfUsers();
+});
+socket.on('message', function(message) {})
 
 server.listen(process.env.PORT || 8080);

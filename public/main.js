@@ -2,9 +2,15 @@ $(document).ready(function() {
     var socket = io();
     var input = $('input');
     var messages = $('#messages');
+    var userCount = $('#numberOfUsers');
 
     var addMessage = function(message) {
         messages.append('<div>' + message + '</div>');
+    };
+
+    var addUserCount = function(numberOfUsers) {
+        console.log(numberOfUsers);
+        userCount.html('<p>Number of users: ' + numberOfUsers + '</p>');
     };
 
     input.on('keydown', function(event) {
@@ -17,6 +23,6 @@ $(document).ready(function() {
         socket.emit('message', message);
         input.val('');
     });
-
     socket.on('message', addMessage);
+    socket.on('userCount', addUserCount);
 });
